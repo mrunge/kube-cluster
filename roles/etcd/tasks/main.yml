@@ -1,0 +1,12 @@
+---
+- name: configure etcd
+  ini_file:
+      dest: '{{ etcd_conf }}'
+      section: ""
+      option: '{{ item.option }}'
+      value: '{{ item.value }}'
+  with_items:
+      - option: ETCD_LISTEN_CLIENT_URLS
+        value: '"http://0.0.0.0:2379"'
+      - option: ETCD_ADVERTISE_CLIENT_URLS
+        value: '"http://0.0.0.0:2379"'

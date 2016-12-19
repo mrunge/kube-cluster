@@ -1,0 +1,42 @@
+---
+- name: install all prerequisites
+  hosts: all
+  tags:
+      - prerequisites
+  roles:
+      - kubernetes
+  handlers:
+      - include: handlers/main.yml
+
+- name: etcd
+  hosts: kube_master
+  tags:
+      - etcd
+  roles:
+      - etcd
+  handlers:
+      - include: handlers/main.yml
+
+- name: kube master
+  hosts: kube_master
+  tags:
+      - kube_master
+  roles:
+      - kube_master
+  handlers:
+      - include: handlers/main.yml
+
+- name: minions
+  hosts: all
+  tags:
+      - minions
+  roles:
+      - minions
+
+  handlers:
+      - include: handlers/main.yml
+
+- name: configure kubectl
+  hosts: all
+  roles:
+      - config_kubectl

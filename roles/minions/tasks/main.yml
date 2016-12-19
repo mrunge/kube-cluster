@@ -1,0 +1,45 @@
+---
+- name: configure kubelet
+  ini_file:
+      dest: '{{ kube_kubelet_conf }}'
+      section: ""
+      option: '{{ item.option }}'
+      value: '{{ item.value }}'
+  with_items:
+      - option: KUBELET_ADDRESS
+        value: '"--address=0.0.0.0"'
+      - option: KUBELET_PORT
+        value: '"--port=10250"'
+      - option: KUBELET_API_SERVER
+        value: '"--api-servers=http://{{kube_master}}:{{kube_port}}"'
+      - option: KUBELET_HOSTNAME
+        value: '"--hostname-override={{ansible_hostname}}"'
+  notify: restart kubelet
+
+- name: configure flannel
+  ini_file:
+      dest: '{{flannel_conf}}'
+      section: ""
+      option: '{{ item.option }}'
+      value: '{{ item.value }}'
+  with_items:
+      - option: FLANNEL_ETCD
+        value: "http://{{etcd_master}}:{{etcd_port}}"
+      - option: FLANNEL_ETCD_KEY
+        value: "/kube-centos/network"
+      - option: FLANNEL_ETCD_PREFIX
+        value: "/kube-centos/network"
+      - option: FLANNEL_ETCD_ENDPOINTS
+        value: "http://{{etcd_master}}:{{etcd_port}}"
+  notify: restart flanneld
+
+- name: start services on minions
+  service:
+      name: '{{ item }}'
+      state: started
+      enabled: yes
+  with_items:
+      - kube-proxy
+      - kubelet
+      - flanneld
+      - docker

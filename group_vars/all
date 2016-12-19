@@ -1,0 +1,12 @@
+kube_master: 192.168.36.67
+kube_port: 8080
+kube_config: /etc/kubernetes/config
+etcd_master: 192.168.36.67
+etcd_port: 2379
+etcd_conf: /etc/etcd/etcd.conf
+kube_apiserver_conf: /etc/kubernetes/apiserver
+
+overlay_net: 172.31.0.0/16
+flannel_conf: /etc/sysconfig/flanneld
+
+kube_kubelet_conf: /etc/kubernetes/kubelet

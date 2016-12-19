@@ -1,0 +1,9 @@
+---
+- name: set cluster
+  command: 'kubectl config set-cluster default-cluster --server=http://{{kube_master}}:{{kube_port}}'
+
+- name: set context
+  command: 'kubectl config set-context default-context --cluster=default-cluster --user=default-admin'
+
+- name: use context
+  command: 'kubectl config use-context default-context'

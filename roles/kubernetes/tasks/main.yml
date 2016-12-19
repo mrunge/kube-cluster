@@ -1,0 +1,48 @@
+---
+- name: ajust hostfiles
+  blockinfile:
+      dest: /etc/hosts
+      block: |
+          192.168.36.67 kube1.berg.ol kube1
+          192.168.36.68 kube2.berg.ol kube2
+          192.168.36.69 kube3.berg.ol kube3
+
+
+- name: install kubernetes
+  package:
+      name: "{{ item }}"
+      state: present
+  with_items:
+      - kubernetes
+      - etcd
+      - flannel
+
+- name: set kube master
+  ini_file:
+      dest: '{{ kube_config }}'
+      option: KUBE_MASTER
+      value: '"--master=http://{{kube_master}}:{{kube_port}}"'
+      section: ""
+
+- name: set kube etcd
+  ini_file:
+      dest: '{{ kube_config }}'
+      option: KUBE_ETCD_SERVERS
+      value: '"--etcd-servers=http://{{kube_master}}:{{etcd_port}}"'
+      section: ""
+
+- name: set flannel to overlay docker network
+  ini_file:
+      dest: '{{flannel_conf}}'
+      section: ''
+      option: '{{ item.option }}'
+      value: '{{ item.value }}'
+  with_items:
+      - option: FLANNEL_ETCD
+        value: "http://{{kube_master}}:{{etcd_port}}"
+      - option: FLANNEL_ETCD_KEY
+        value: "/kube-centos/network"
+      - option: FLANNEL_OPTIONS
+        value: ""
+      - option: FLANNEL_ETCD_PREFIX
+        value: "/kube-centos/network"
